@@ -43,12 +43,26 @@ function App() {
     setLoading(true);
     setError("");
     setQuality(null);
+    // Prepare the inputs as an array in the correct order
+    const numericInputs = [
+      parseFloat(inputs.fixed_acidity),
+      parseFloat(inputs.volatile_acidity),
+      parseFloat(inputs.citric_acid),
+      parseFloat(inputs.residual_sugar),
+      parseFloat(inputs.chlorides),
+      parseFloat(inputs.free_sulfur_dioxide),
+      parseFloat(inputs.total_sulfur_dioxide),
+      parseFloat(inputs.density),
+      parseFloat(inputs.pH),
+      parseFloat(inputs.sulphates),
+      parseFloat(inputs.alcohol)
+    ];
     try {
       const response = await axios.post(
         "https://wine-quality-predictor-2-op2n.onrender.com/predict",
-        inputs
+        { inputs: numericInputs }
       );
-      setQuality(response.data.quality);
+      setQuality(response.data.output);
     } catch (err) {
       setError("Failed to get prediction. Please check your input values.");
     } finally {
@@ -89,7 +103,7 @@ function App() {
         </div>
         <p className="wine-desc">Enter the wine's chemical features below and discover its predicted quality score! 🍇🍷</p>
         <form onSubmit={handleSubmit} className="wine-form wine-funky-form">
-          {featureList.map((feature, idx) => (
+          {featureList.map((feature) => (
             <div className="wine-form-group wine-funky-form-group" key={feature.key}>
               <label htmlFor={feature.key}>{feature.name}</label>
               <input
@@ -101,9 +115,6 @@ function App() {
                 onChange={handleChange}
                 required
                 className="wine-funky-input"
-                placeholder={
-                  idx % 2 === 0 ? `e.g. ${Math.random().toFixed(2)}` : `e.g. ${Math.random().toFixed(3)}`
-                }
               />
             </div>
           ))}
